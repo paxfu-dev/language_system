@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'at.paxfu.velo'
+version '1.0'
+
+compileJava.options.encoding = "UTF-8"
+sourceCompatibility = 1.8
+
+sourceSets {
+    main.java.srcDirs = ['src/main/java']
+    main.resources.srcDirs = ['src/main/resources']
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'http://195.201.150.21:8081/repository/minetania-public/' }
+    maven { url 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://repo.codemc.io/repository/maven-snapshots/' }
+    maven { url = 'https://repo.citizensnpcs.co/' }
+    maven { url = 'http://195.201.150.21:8081/repository/minetania-public/' }
+    maven { url = 'https://repo.cloudnetservice.eu/repository/releases/' }
+    maven { url = "https://maven.enginehub.org/repo/" }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven {
+        url "https://gitlab.com/api/v4/groups/10414954/-/packages/maven"
+        name "GitLab"
+        credentials(HttpHeaderCredentials) {
+            if (System.getenv("CI_JOB_TOKEN") != null) {
+                // GitLab CI
+                name = "Job-Token"
+                value = System.getenv("CI_JOB_TOKEN")
+            } else {
+                name = 'Private-Token'
+                value = gitLabPrivateToken
+            }
+        }
+        authentication {
+            header(HttpHeaderAuthentication)
+        }
+    }
+}
+
+dependencies {
+    compile 'fr.minuskube:netherboard-bukkit:1.2.1'
+    compileOnly('org.spigotmc:spigot:1.12.2')
+    compileOnly 'net.luckperms:api:5.2'
+    compileOnly('de.dytanic.cloudnet:cloudnet-api-bridge:2.1.17')
+    //compileOnly('net.minetania.item:CustomItems:1.1')
+    //compileOnly('de.cosmohdx.inventoryprotector:InventoryProtector:1.2')
+    compileOnly('net.citizensnpcs:citizens:2.0.27-SNAPSHOT')
+    compileOnly 'me.clip:placeholderapi:2.10.9'
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    baseName 'LanguageSystem'
+}
+publishing {
+    repositories {
+        maven {
+            url = "https://gitlab.com/api/v4/projects/"+System.getenv("CI_PROJECT_ID")+"/packages/maven"
+            name = "GitLab"
+            credentials(HttpHeaderCredentials) {
+                if (System.getenv("CI_JOB_TOKEN") != null) {
+                    // GitLab CI
+                    name = "Job-Token"
+                    value = System.getenv("CI_JOB_TOKEN")
+                } else {
+                    name = "Deploy-Token"
+                    value = System.getenv("CI_DEPLOY_TOKEN")
+                }
+            }
+            authentication {
+                header(HttpHeaderAuthentication)
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}

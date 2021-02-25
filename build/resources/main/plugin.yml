@@ -1,0 +1,7 @@
+name: LanguageSystem
+author: paxfu
+main: at.paxfu.velo.LanguageSystem
+version: 1.0
+commands:
+  language:
+    aliases: [lang]
